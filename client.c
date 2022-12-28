@@ -8,7 +8,7 @@
 
 /* A TCP/IP client that recieves "Hello Client!" from server.
  * Written using only POSIX syscalls.
- * This programme is only capable of connects to INADDR_LOOPBACK (localhost)
+ * This programme is only capable of connecting to INADDR_LOOPBACK (localhost)
  */
 
 void throw(void);
