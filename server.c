@@ -6,21 +6,21 @@
 
 #define PORT 8080
 
-/* TCP/IP server that echos "Hello Client!" to client.
+/* A TCP/IP server that echos "Hello Client!" to client.
  * Written using only POSIX syscalls.
  */
 
 void throw(void);
 int main(void)
 {
-// 1. socket()
+// 0. socket()
     int server_socket_fd
         = socket(PF_INET
                 ,SOCK_STREAM
                 ,0);
     if (server_socket_fd == -1) throw();
 
-// 2. bind()
+// 1. bind()
     struct sockaddr_in server_addr;
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
@@ -32,23 +32,23 @@ int main(void)
               ,sizeof(server_addr));
     if (result == -1) throw();
 
-// 3. listen()
+// 2. listen()
     result
         = listen(server_socket_fd, 1);
     if (result == -1) throw();
     
-// 4. accept()
+// 3. accept()
     int client_socket_fd
         = accept(server_socket_fd
                 ,NULL
                 ,NULL);
     if (result == -1) throw();
 
-// 5. read() and write()
+// 4. read() and write()
     const char *message = "Hello Client!";
     write(client_socket_fd, message, strlen(message));
 
-// 6. close()
+// 5. close()
     close(server_socket_fd);
     close(client_socket_fd);
 
