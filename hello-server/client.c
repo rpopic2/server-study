@@ -1,4 +1,3 @@
-#include <netinet/in.h>
 #include <netinet/ip.h>
 #include <unistd.h>
 #include <errno.h>
