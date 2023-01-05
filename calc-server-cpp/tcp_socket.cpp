@@ -1,5 +1,6 @@
 #include "tcp_socket.h"
 #include <cstring>
+#include <iostream>
 #include <stdexcept>
 tcp_socket::tcp_socket() {
     socket_fd = ::socket(PF_INET, SOCK_STREAM, 0);
@@ -7,6 +8,7 @@ tcp_socket::tcp_socket() {
 }
 tcp_socket::~tcp_socket() {
     ::close(socket_fd);
+    std::cout << "Socket closed" << std::endl;
 }
 void tcp_socket::bind(u32 addr_net_ordered, u16 port_net_ordered) {
     sockaddr_in addr;
@@ -30,13 +32,33 @@ void tcp_socket::connect(u32 addr_net_ordered, u16 port_net_ordered) {
     if (result == -1) throw_err();
 }
 tcp_socket &operator<<(tcp_socket &sock, std::string msg) {
-    ::write(sock.socket_fd, msg.c_str(), msg.length());
+    ::write(sock.socket_fd, msg.c_str(), msg.length() + 1);
+    return sock;
+}
+tcp_socket &operator>>(tcp_socket &sock, tcp_socket::prefix prefix) {
+    sock._prefix = prefix;
+    return sock;
+}
+tcp_socket &operator>>(tcp_socket &sock, tcp_socket::noprefix __nopre) {
+    sock._prefix = tcp_socket::prefix("");
     return sock;
 }
 tcp_socket &operator>>(tcp_socket &sock, std::string &msg) {
-    ::read(sock.socket_fd, sock.buf, tcp_socket::BUF_SIZE);
-    msg = sock.buf;
+    memset(&sock.rbuf, 0, tcp_socket::BUF_SIZE);
+    ::read(sock.socket_fd, sock.rbuf, tcp_socket::BUF_SIZE);
+    msg = sock._prefix.str + sock.rbuf;
     return sock;
+}
+tcp_socket &operator>>(tcp_socket &sock, std::ostream &os) {
+    memset(&sock.rbuf, 0, tcp_socket::BUF_SIZE);
+    ::read(sock.socket_fd, sock.rbuf, tcp_socket::BUF_SIZE);
+    os << sock._prefix.str << sock.rbuf;
+    return sock;
+}
+std::istream &operator>>(std::istream &is, tcp_socket &sock) {
+    is.getline(sock.rbuf, tcp_socket::BUF_SIZE);
+    sock << sock.rbuf;
+    return is;
 }
 
 //utils
@@ -55,4 +77,7 @@ u32 ipaddr::ipaddr(const char *literal) {
 }
 u16 port::port(int literal) {
     return htons(literal);
+}
+void buf::operator=(std::string s) {
+    this->str = s;
 }

@@ -18,6 +18,13 @@ namespace ipaddr {
 namespace port {
     u16 port(int literal);
 }
+class buf {
+public:
+    static const auto SIZE = 1 << 10;
+    void operator=(std::string s);
+private:
+    std::string str;
+};
 
 class tcp_socket {
 public:
@@ -29,10 +36,18 @@ public:
     void connect(u32 addr_net_ordered, u16 port_net_ordered);
     friend tcp_socket &operator<<(tcp_socket &sock, std::string msg);
     friend tcp_socket &operator>>(tcp_socket &sock, std::string &msg);
+    friend tcp_socket &operator>>(tcp_socket &sock, std::ostream &os);
+    struct prefix { std::string str; prefix(std::string __prefix):str(__prefix){} };
+    struct noprefix{};
+    friend tcp_socket &operator>>(tcp_socket &sock, prefix __prefix);
+    friend tcp_socket &operator>>(tcp_socket &sock, noprefix __nopre);
+    friend std::istream &operator>>(std::istream &is, tcp_socket &sock);
 private:
+    prefix _prefix{""};
     static const auto BUF_SIZE = 1 << 10;
     fd_t socket_fd;
-    char buf[BUF_SIZE];
+    char rbuf[BUF_SIZE];
+    buf buffer;
     void throw_err();
     class sockaddr;
 };
@@ -44,3 +59,4 @@ public:
 private:
     sockaddr_in addr;
 };
+
