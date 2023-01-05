@@ -5,7 +5,7 @@
 SCRIPT_NAME=$0
 function usage {
     >&2 cat << EOF
-Usage : $SCRIPT_NAME <path> <additional_file>
+Usage : $SCRIPT_NAME <path>
 Provide <path> where server.c*, client.c* is contained.
 EOF
     exit $1
@@ -14,7 +14,7 @@ EOF
 if test -z $1; then
     usage 1
 fi
-ADD_FILE=$(realpath $1)/$2
+
 SERVER_PATH=$(realpath $1)/server.c*
 CLIENT_PATH=$(realpath $1)/client.c*
 LIB_PATH=$(realpath $1)/client.c*
@@ -27,7 +27,7 @@ fi
 function compile {
     EXTENSION=$(basename $1 | cut -d'.' -f2)
     if test $EXTENSION == "cpp"; then
-        clang++ $ADD_FILE $1 -Wall -std=c++20 -o $2
+        clang++ $1 tcp_socket.cpp -Wall -std=c++20 -o $2
     else
         clang $1 -o $2
     fi

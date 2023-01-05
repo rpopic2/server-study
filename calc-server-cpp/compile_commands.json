@@ -1,0 +1,7 @@
+[
+    {
+        "directory": "/Users/rpopic2/server-study/calc-server-cpp",
+        "file": "*.cpp",
+        "command": "/usr/bin/clang++ -std=c++20 -Wall"
+    }
+]
