@@ -1,19 +1,20 @@
-#include "tcp_socket.h"
+#include "lib/tcp.h"
 #include <iostream>
 
 int main() {
-    std::cout << "Connecting to the server..." << std::endl;
-    tcp_socket socket;
-    socket.connect(ipaddr::LOOPBACK, port::port(8080));
-    socket << "Client connected\n";
+    tcp::socket sock;
+    sock.connect("127.0.0.1:8080");
+    std::string buf;
 
-    while (true) {
-        socket >> std::cout;
-        std::cin >> socket;
+    sock.safe_read(buf);
+    std::cout<< buf;
 
-        std::string msg;
-        socket >> msg;
-        if (msg == "exit") return 0;
-        std::cout << "[Server] " << msg << std::endl;
+    bool run = true;
+    std::string ibuf;
+    while (run) {
+        std::cin >> ibuf;
+        sock.safe_write(ibuf.c_str());
+        sock.safe_read(buf);
+        std::cout << "[Server echo] "<< buf << std::endl;
     }
 }
