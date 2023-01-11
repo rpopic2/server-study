@@ -1,10 +1,11 @@
 #include "lib/tcp.h"
 #include <iostream>
 
-int main() {
+int main(int argc, char *argv[]) {
     tcp::socket socket;
     std::cout << "connecting to the server..." << std::endl;
-    socket.connect("127.0.0.1:8080");
+    const char *addr = argc == 2 ? argv[1] : "127.0.0.1:8080";
+    socket.connect(addr);
     std::string rbuf;
     socket.safe_read_str(rbuf);
     std::cout << rbuf << std::endl;

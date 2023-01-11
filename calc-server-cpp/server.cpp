@@ -4,14 +4,14 @@
 #include <iostream>
 
 void send(tcp::socket &sock, std::string s);
-int main() {
+int main(int argc, char *argv[]) {
     tcp::socket socket;
-    socket.bind("0.0.0.0:8080");
+    const char *addr = argc == 2 ? argv[1] : "0.0.0.0:8080";
+    socket.bind(addr);
     socket.listen();
     tcp::socket client = socket.accept();
     client.safe_write_str("Welcome.");
     std::cout << "A client has connected." << std::endl;
-
 
     while (true) {
         std::istringstream iss;
