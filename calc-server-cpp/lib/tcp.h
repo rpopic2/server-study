@@ -18,12 +18,13 @@ namespace tcp {
         void connect(const char *__addr);
         void bind(const char *__addr);
         void listen();
-        socket accept();
+        [[nodiscard]] socket accept();
         void write(const char *__str);
         void safe_write(const char *__str);
-        isize read(char *__str);
+        void safe_write_str(std::string __str);
+        isize read(char *__str, usize len);
         isize safe_read(char *__str);
-        isize safe_read(std::string &__str);
+        isize safe_read_str(std::string &__str);
     };
 }
 namespace tcpip {

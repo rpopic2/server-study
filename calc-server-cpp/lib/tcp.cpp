@@ -38,7 +38,7 @@ namespace tcp {
         ::listen(fd, 0);
         if (errno) throw_err();
     }
-    socket socket::accept() {
+    [[nodiscard]] socket socket::accept() {
         fd_t incoming_fd = ::accept(fd, NULL, NULL);
         if (errno) throw_err();
         return socket(incoming_fd);
@@ -47,8 +47,8 @@ namespace tcp {
         ::write(fd, __str, strlen(__str));
         if (errno) throw_err();
     }
-    isize socket::read(char *__str) {
-        isize bytes_read = ::read(fd, __str, READ_MAX);
+    isize socket::read(char *__str, usize len = READ_MAX) {
+        isize bytes_read = ::read(fd, __str, len);
         if (errno) throw_err();
         return bytes_read;
     }
@@ -58,6 +58,9 @@ namespace tcp {
         char len = message.length();
         message[0] = len;
         write(message.c_str());
+    }
+    void socket::safe_write_str(std::string __str) {
+        safe_write(__str.c_str());
     }
     isize socket::safe_read(char *__str) {
         isize bytes_read;
@@ -73,12 +76,13 @@ namespace tcp {
         }
         return bytes_read;
     }
-    isize socket::safe_read(std::string &__str) {
+    isize socket::safe_read_str(std::string &__str) {
         static char buf[READ_MAX];
         memset(&buf, 0, READ_MAX);
         isize bytes_read = safe_read(buf);
         __str = buf;
-        return bytes_read;
+        __str = __str.substr(1, __str.length());
+        return bytes_read - 1;
     }
 }
 namespace tcpip {
